@@ -1,21 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { AppLogo } from '@/components/app-logo';
 import { TopSummary } from '@/components/top-summary';
 import { MonthSwitcher } from '@/components/month-switcher';
 import { MonthCalendar } from '@/components/month-calendar';
 import { DayList } from '@/components/day-list';
 import { FAB } from '@/components/fab';
 import { EntryModal } from '@/components/entry-modal';
+import { DateEntriesModal } from '@/components/date-entries-modal';
 import { useEntriesByDate } from '@/lib/hooks/use-entries';
 import { EntryWithDetails } from '@/lib/types';
 import { mutate } from 'swr';
+import { deleteEntry } from '@/server/actions';
+import { toast } from 'sonner';
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const monthParam = searchParams.get('month');
+
   const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.toISOString().slice(0, 7)); // YYYY-MM
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().slice(0, 10)); // YYYY-MM-DD
+  const [currentMonth, setCurrentMonth] = useState(monthParam || today.toISOString().slice(0, 7)); // YYYY-MM
+  const [selectedDate, setSelectedDate] = useState(
+    monthParam ? `${monthParam}-01` : today.toISOString().slice(0, 10)
+  ); // YYYY-MM-DD
+
+  // URL 쿼리 파라미터가 변경되면 월 업데이트
+  useEffect(() => {
+    if (monthParam && monthParam !== currentMonth) {
+      setCurrentMonth(monthParam);
+      setSelectedDate(`${monthParam}-01`);
+    }
+  }, [monthParam]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<EntryWithDetails | null>(null);
 
   const { data: entries } = useEntriesByDate(selectedDate);
@@ -35,16 +54,44 @@ export default function HomePage() {
     }
   };
 
+  const handleDateDoubleClick = (date: string) => {
+    setSelectedDate(date);
+    setIsDateModalOpen(true);
+  };
+
   const handleAddEntry = () => {
     setEditingEntry(null);
+    setIsDateModalOpen(false);
     setIsModalOpen(true);
   };
 
-  const handleEditEntry = (entryId: string) => {
+  const handleEditEntry = (entry: EntryWithDetails) => {
+    setEditingEntry(entry);
+    setIsDateModalOpen(false);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    try {
+      const result = await deleteEntry(entryId);
+      if (result.success) {
+        toast.success('항목이 삭제되었습니다');
+        mutate(['entries', selectedDate]);
+        mutate(['month-summary', currentMonth]);
+        mutate(['month-entries', currentMonth]);
+      } else {
+        toast.error(result.error || '삭제에 실패했습니다');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('삭제에 실패했습니다');
+    }
+  };
+
+  const handleEditEntryById = (entryId: string) => {
     const entry = entries?.find(e => e.id === entryId);
     if (entry) {
-      setEditingEntry(entry);
-      setIsModalOpen(true);
+      handleEditEntry(entry);
     }
   };
 
@@ -57,31 +104,47 @@ export default function HomePage() {
     // SWR 캐시 갱신
     mutate(['entries', selectedDate]);
     mutate(['month-summary', currentMonth]);
+    mutate(['month-entries', currentMonth]);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 월 요약 */}
-      <TopSummary month={currentMonth} />
-
-      {/* 월 전환 */}
-      <MonthSwitcher
-        currentMonth={currentMonth}
-        onMonthChange={handleMonthChange}
-      />
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* 상단 고정 영역 */}
+      <div className="sticky top-0 z-20 shadow-sm">
+        {/* 로고 */}
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 px-4 pt-3 pb-2 flex justify-center">
+          <AppLogo size="sm" />
+        </div>
+        
+        {/* 월 요약 */}
+        <TopSummary month={currentMonth} />
+        
+        {/* 월 전환 */}
+        <div className="bg-white border-b px-4 py-2">
+          <MonthSwitcher
+            currentMonth={currentMonth}
+            onMonthChange={handleMonthChange}
+          />
+        </div>
+      </div>
 
       {/* 달력 */}
-      <MonthCalendar
-        currentMonth={currentMonth}
-        selectedDate={selectedDate}
-        onDateSelect={handleDateSelect}
-      />
+      <div className="bg-white mb-2">
+        <MonthCalendar
+          currentMonth={currentMonth}
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+          onDateDoubleClick={handleDateDoubleClick}
+        />
+      </div>
 
       {/* 선택된 날짜의 항목 리스트 */}
-      <DayList
-        selectedDate={selectedDate}
-        onEditEntry={handleEditEntry}
-      />
+      <div className="px-3">
+        <DayList
+          selectedDate={selectedDate}
+          onEditEntry={handleEditEntryById}
+        />
+      </div>
 
       {/* FAB */}
       <FAB onClick={handleAddEntry} />
@@ -93,6 +156,17 @@ export default function HomePage() {
         selectedDate={selectedDate}
         entry={editingEntry}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* Date Entries Modal */}
+      <DateEntriesModal
+        isOpen={isDateModalOpen}
+        onClose={() => setIsDateModalOpen(false)}
+        date={selectedDate}
+        entries={entries || []}
+        onEditEntry={handleEditEntry}
+        onDeleteEntry={handleDeleteEntry}
+        onAddEntry={handleAddEntry}
       />
     </div>
   );

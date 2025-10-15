@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 export const EntrySchema = z.object({
-  kind: z.enum(['income', 'expense']),
+  kind: z.enum(['income', 'expense', 'savings']),
   amount: z.preprocess(
     (val) => {
       if (typeof val === 'string') {

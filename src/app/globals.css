@@ -53,7 +53,35 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 모바일 최적화 */
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* 터치 영역 최소 크기 보장 */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 스크롤 개선 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Input 포커스 시 줌 방지 */
+  input, select, textarea {
+    font-size: 16px;
   }
 }

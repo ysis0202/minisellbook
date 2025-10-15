@@ -6,10 +6,35 @@ import { EntrySchema, type EntryFormData } from '@/lib/schemas';
 import { revalidatePath } from 'next/cache';
 
 export async function signInWithGoogle() {
-  const supabase = createServer();
+  const supabase = await createServer();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
+    options: {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      scopes: 'email profile', // 이메일 및 프로필 정보 권한 요청
+      queryParams: {
+        access_type: 'offline', // 오프라인 액세스 (선택사항)
+        prompt: 'consent', // 항상 동의 화면 표시 (선택사항)
+      },
+    },
+  });
+
+  if (error) {
+    console.error('Error:', error);
+    return { error: error.message };
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+}
+
+export async function signInWithKakao() {
+  const supabase = await createServer();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'kakao',
     options: {
       redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
     },
@@ -26,13 +51,13 @@ export async function signInWithGoogle() {
 }
 
 export async function signOut() {
-  const supabase = createServer();
+  const supabase = await createServer();
   await supabase.auth.signOut();
   redirect('/auth');
 }
 
 export async function ensureOnboard() {
-  const supabase = createServer();
+  const supabase = await createServer();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -63,7 +88,7 @@ export async function ensureOnboard() {
 }
 
 export async function createEntry(data: EntryFormData) {
-  const supabase = createServer();
+  const supabase = await createServer();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -94,7 +119,7 @@ export async function createEntry(data: EntryFormData) {
 }
 
 export async function updateEntry(entryId: string, data: EntryFormData) {
-  const supabase = createServer();
+  const supabase = await createServer();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -124,7 +149,7 @@ export async function updateEntry(entryId: string, data: EntryFormData) {
 }
 
 export async function deleteEntry(entryId: string) {
-  const supabase = createServer();
+  const supabase = await createServer();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

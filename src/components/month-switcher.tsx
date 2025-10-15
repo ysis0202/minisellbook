@@ -34,19 +34,19 @@ export function MonthSwitcher({ currentMonth, onMonthChange }: MonthSwitcherProp
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white border-b">
+    <div className="flex items-center justify-between">
       <Button
         variant="ghost"
         size="icon"
         onClick={() => changeMonth('prev')}
-        className="h-8 w-8"
+        className="h-9 w-9 rounded-full hover:bg-gray-100 active:scale-95"
       >
-        <ChevronLeft className="w-4 h-4" />
+        <ChevronLeft className="w-5 h-5" />
       </Button>
 
       <button
         onClick={goToToday}
-        className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors"
+        className="text-base font-bold text-gray-900 hover:text-emerald-600 transition-colors active:scale-95"
       >
         {formatMonth(currentMonth)}
       </button>
@@ -55,9 +55,9 @@ export function MonthSwitcher({ currentMonth, onMonthChange }: MonthSwitcherProp
         variant="ghost"
         size="icon"
         onClick={() => changeMonth('next')}
-        className="h-8 w-8"
+        className="h-9 w-9 rounded-full hover:bg-gray-100 active:scale-95"
       >
-        <ChevronRight className="w-4 h-4" />
+        <ChevronRight className="w-5 h-5" />
       </Button>
     </div>
   );

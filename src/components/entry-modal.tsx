@@ -26,7 +26,8 @@ interface EntryModalProps {
 
 export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: EntryModalProps) {
   const [loading, setLoading] = useState(false);
-  const [selectedKind, setSelectedKind] = useState<'income' | 'expense'>('expense');
+  const [selectedKind, setSelectedKind] = useState<'income' | 'expense' | 'savings'>('expense');
+  const [displayAmount, setDisplayAmount] = useState('');
 
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
@@ -47,9 +48,11 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
   useEffect(() => {
     if (entry) {
       setSelectedKind(entry.kind);
+      const amount = Number(entry.amount);
+      setDisplayAmount(amount > 0 ? new Intl.NumberFormat('ko-KR').format(amount) : '');
       form.reset({
         kind: entry.kind,
-        amount: Number(entry.amount),
+        amount: amount,
         entry_date: entry.entry_date,
         account_id: entry.account_id || '',
         category_id: entry.category_id || '',
@@ -60,6 +63,7 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
       const defaultAccount = accounts?.find(acc => acc.is_default);
       const defaultCategory = categories?.find(cat => cat.kind === selectedKind);
 
+      setDisplayAmount('');
       form.reset({
         kind: selectedKind,
         amount: 0,
@@ -71,7 +75,7 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
     }
   }, [entry, selectedDate, selectedKind, accounts, categories, form]);
 
-  const handleKindChange = (kind: 'income' | 'expense') => {
+  const handleKindChange = (kind: 'income' | 'expense' | 'savings') => {
     setSelectedKind(kind);
     form.setValue('kind', kind);
 
@@ -79,6 +83,10 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
     const defaultCategory = categories?.find(cat => cat.kind === kind);
     if (defaultCategory) {
       form.setValue('category_id', defaultCategory.id);
+    } else if (kind === 'savings') {
+      // 저축 카테고리가 없으면 경고
+      console.warn('저축 카테고리가 없습니다. DB 스키마를 확인하세요.');
+      toast.error('저축 카테고리가 없습니다. 관리자에게 문의하세요.');
     }
   };
 
@@ -132,125 +140,129 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
     }
   };
 
-  const formatAmount = (value: string) => {
-    const number = value.replace(/[^\d]/g, '');
-    return new Intl.NumberFormat('ko-KR').format(Number(number));
-  };
-
   const filteredCategories = categories?.filter(cat => cat.kind === selectedKind) || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-4">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>{entry ? '항목 수정' : '새 항목 추가'}</span>
-            {entry && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDelete}
-                disabled={loading}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
+      <DialogContent className="max-w-md mx-3 p-0 gap-0">
+        <DialogHeader className="px-4 pt-4 pb-3 border-b">
+          <DialogTitle className="text-base">
+            {entry ? '항목 수정' : '새 항목 추가'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* 수입/지출 토글 */}
-          <div className="flex gap-2">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="px-4 py-3 space-y-3">
+          {/* 수입/지출/저축 토글 */}
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              type="button"
+              variant={selectedKind === 'income' ? 'default' : 'outline'}
+              onClick={() => handleKindChange('income')}
+              className={`h-9 text-sm ${selectedKind === 'income' ? 'bg-green-600 hover:bg-green-700' : ''}`}
+            >
+              수입
+            </Button>
             <Button
               type="button"
               variant={selectedKind === 'expense' ? 'default' : 'outline'}
               onClick={() => handleKindChange('expense')}
-              className="flex-1"
+              className={`h-9 text-sm ${selectedKind === 'expense' ? 'bg-red-600 hover:bg-red-700' : ''}`}
             >
               지출
             </Button>
             <Button
               type="button"
-              variant={selectedKind === 'income' ? 'default' : 'outline'}
-              onClick={() => handleKindChange('income')}
-              className="flex-1"
+              variant={selectedKind === 'savings' ? 'default' : 'outline'}
+              onClick={() => handleKindChange('savings')}
+              className={`h-9 text-sm ${selectedKind === 'savings' ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
             >
-              수입
+              저축
             </Button>
           </div>
 
           {/* 금액 */}
-          <div className="space-y-2">
-            <Label htmlFor="amount">금액</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="amount" className="text-xs">금액</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <DollarSign className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
               <Input
                 id="amount"
                 type="text"
+                inputMode="numeric"
                 placeholder="0"
-                className="pl-10 text-right text-lg font-bold"
-                {...form.register('amount', {
-                  setValueAs: (value) => {
-                    const number = value.replace(/[^\d]/g, '');
-                    return Number(number);
-                  },
-                })}
+                value={displayAmount}
+                className="pl-9 text-right text-base font-bold h-10"
                 onChange={(e) => {
-                  const formatted = formatAmount(e.target.value);
-                  e.target.value = formatted;
-                  form.setValue('amount', Number(e.target.value.replace(/[^\d]/g, '')));
+                  const input = e.target.value;
+                  const numbersOnly = input.replace(/[^\d]/g, '');
+                  const formatted = numbersOnly ? new Intl.NumberFormat('ko-KR').format(Number(numbersOnly)) : '';
+                  setDisplayAmount(formatted);
+                  form.setValue('amount', Number(numbersOnly) || 0);
                 }}
               />
             </div>
             {form.formState.errors.amount && (
-              <p className="text-red-500 text-sm">{form.formState.errors.amount.message}</p>
+              <p className="text-red-500 text-xs">{form.formState.errors.amount.message}</p>
             )}
           </div>
 
-          {/* 카테고리 */}
-          <div className="space-y-2">
-            <Label htmlFor="category">카테고리</Label>
-            <Select
-              value={form.watch('category_id')}
-              onValueChange={(value) => form.setValue('category_id', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="카테고리 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    <span className="flex items-center gap-2">
-                      <span>{category.emoji}</span>
-                      <span>{category.name}</span>
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.category_id && (
-              <p className="text-red-500 text-sm">{form.formState.errors.category_id.message}</p>
-            )}
-          </div>
+          {/* 카테고리 - 저축이 아닐 때만 표시 */}
+          {selectedKind !== 'savings' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="category" className="text-xs">카테고리</Label>
+              <Select
+                value={form.watch('category_id')}
+                onValueChange={(value) => form.setValue('category_id', value)}
+              >
+                <SelectTrigger className="h-9 text-sm">
+                  <SelectValue placeholder="카테고리 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      <span className="flex items-center gap-1.5 text-sm">
+                        <span className="text-base">{category.emoji}</span>
+                        <span>{category.name}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.category_id && (
+                <p className="text-red-500 text-xs">{form.formState.errors.category_id.message}</p>
+              )}
+            </div>
+          )}
+
+          {/* 저축일 때 안내 메시지 */}
+          {selectedKind === 'savings' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">💰</span>
+                <p className="text-xs text-blue-700">
+                  저축 항목으로 자동 분류됩니다
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 계정 */}
-          <div className="space-y-2">
-            <Label htmlFor="account">계정</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="account" className="text-xs">계정</Label>
             <Select
               value={form.watch('account_id')}
               onValueChange={(value) => form.setValue('account_id', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-9 text-sm">
                 <SelectValue placeholder="계정 선택" />
               </SelectTrigger>
               <SelectContent>
                 {accounts?.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-1.5 text-sm">
                       <span>{account.name}</span>
                       {account.is_default && (
-                        <span className="text-xs bg-blue-100 text-blue-600 px-1 py-0.5 rounded">
+                        <span className="text-[10px] bg-blue-100 text-blue-600 px-1 py-0.5 rounded">
                           기본
                         </span>
                       )}
@@ -260,52 +272,66 @@ export function EntryModal({ isOpen, onClose, selectedDate, entry, onSuccess }: 
               </SelectContent>
             </Select>
             {form.formState.errors.account_id && (
-              <p className="text-red-500 text-sm">{form.formState.errors.account_id.message}</p>
+              <p className="text-red-500 text-xs">{form.formState.errors.account_id.message}</p>
             )}
           </div>
 
           {/* 날짜 */}
-          <div className="space-y-2">
-            <Label htmlFor="date">날짜</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="date" className="text-xs">날짜</Label>
             <Input
               id="date"
               type="date"
+              className="h-9 text-sm"
               {...form.register('entry_date')}
             />
             {form.formState.errors.entry_date && (
-              <p className="text-red-500 text-sm">{form.formState.errors.entry_date.message}</p>
+              <p className="text-red-500 text-xs">{form.formState.errors.entry_date.message}</p>
             )}
           </div>
 
           {/* 메모 */}
-          <div className="space-y-2">
-            <Label htmlFor="memo">메모 (선택)</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="memo" className="text-xs">메모 (선택)</Label>
             <Input
               id="memo"
               type="text"
               placeholder="메모를 입력하세요"
+              className="h-9 text-sm"
               {...form.register('memo')}
             />
             {form.formState.errors.memo && (
-              <p className="text-red-500 text-sm">{form.formState.errors.memo.message}</p>
+              <p className="text-red-500 text-xs">{form.formState.errors.memo.message}</p>
             )}
           </div>
 
           {/* 버튼 */}
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-2 border-t">
+            {entry && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDelete}
+                disabled={loading}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-9 text-sm"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1" />
+                삭제
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={loading}
-              className="flex-1"
+              className="flex-1 h-9 text-sm"
             >
               취소
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="flex-1"
+              className="flex-1 h-9 text-sm"
             >
               {loading ? '저장 중...' : entry ? '수정' : '추가'}
             </Button>

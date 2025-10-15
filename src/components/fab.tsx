@@ -15,13 +15,13 @@ export function FAB({ onClick, className }: FABProps) {
       onClick={onClick}
       size="icon"
       className={cn(
-        'fixed bottom-20 right-4 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-10',
-        'bg-blue-600 hover:bg-blue-700 text-white',
+        'fixed bottom-20 right-5 h-16 w-16 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 z-20',
+        'bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white',
         className
       )}
       aria-label="새 항목 추가"
     >
-      <Plus className="w-6 h-6" />
+      <Plus className="w-7 h-7 stroke-[2.5]" />
     </Button>
   );
 }

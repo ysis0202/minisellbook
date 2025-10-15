@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ensureOnboard } from '@/server/actions';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, User, CreditCard, Tags } from 'lucide-react';
@@ -11,6 +11,7 @@ export default function OnboardPage() {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const router = useRouter();
+  const supabase = createClient();
 
   const steps = [
     { icon: User, title: '프로필 설정', description: '기본 프로필을 생성합니다' },
@@ -21,20 +22,54 @@ export default function OnboardPage() {
   const handleOnboard = async () => {
     setLoading(true);
     try {
-      const result = await ensureOnboard();
-      if (result.ok) {
-        // 단계별 애니메이션
-        for (let i = 0; i < steps.length; i++) {
-          setStep(i + 1);
-          await new Promise(resolve => setTimeout(resolve, 800));
-        }
+      // 먼저 세션을 가져옴
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        setTimeout(() => {
-          router.push('/home');
-        }, 1000);
-      } else {
-        console.error('Onboard failed:', result.error);
+      console.log('Session check:', { session, sessionError });
+
+      if (!session) {
+        console.error('No session found');
+        alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+        router.push('/auth');
+        return;
       }
+
+      const user = session.user;
+
+      // 이미 프로필이 있는지 확인
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!existing) {
+        // OAuth provider 확인
+        const authProvider = user.app_metadata?.provider || 'google';
+
+        // 온보딩 진행
+        const { error } = await supabase.rpc('fn_onboard_seed', {
+          p_user_id: user.id,
+          p_display_name: user.user_metadata?.name ?? user.user_metadata?.full_name ?? '사용자',
+          p_email: user.email,
+          p_auth_provider: authProvider
+        });
+
+        if (error) {
+          console.error('Onboard error:', error);
+          return;
+        }
+      }
+
+      // 단계별 애니메이션
+      for (let i = 0; i < steps.length; i++) {
+        setStep(i + 1);
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
     } catch (error) {
       console.error('Onboard error:', error);
     } finally {
@@ -43,12 +78,14 @@ export default function OnboardPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-4">
+      <Card className="w-full max-w-md shadow-xl border-0">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">환영합니다! 🎉</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            환영합니다! 🎉
+          </CardTitle>
           <CardDescription>
-            미니셀북을 시작하기 위해 기본 설정을 진행합니다
+            MoneyCells를 시작하기 위해 기본 설정을 진행합니다
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

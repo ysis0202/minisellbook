@@ -61,7 +61,7 @@ export type Database = {
           id: string;
           user_id: string;
           name: string;
-          kind: 'income' | 'expense';
+          kind: 'income' | 'expense' | 'savings';
           emoji: string | null;
           color: string | null;
           sort: number;
@@ -73,7 +73,7 @@ export type Database = {
           id?: string;
           user_id: string;
           name: string;
-          kind: 'income' | 'expense';
+          kind: 'income' | 'expense' | 'savings';
           emoji?: string | null;
           color?: string | null;
           sort?: number;
@@ -85,7 +85,7 @@ export type Database = {
           id?: string;
           user_id?: string;
           name?: string;
-          kind?: 'income' | 'expense';
+          kind?: 'income' | 'expense' | 'savings';
           emoji?: string | null;
           color?: string | null;
           sort?: number;
@@ -100,7 +100,7 @@ export type Database = {
           user_id: string;
           account_id: string | null;
           category_id: string | null;
-          kind: 'income' | 'expense';
+          kind: 'income' | 'expense' | 'savings';
           amount: number;
           memo: string | null;
           entry_date: string;
@@ -115,7 +115,7 @@ export type Database = {
           user_id: string;
           account_id?: string | null;
           category_id?: string | null;
-          kind: 'income' | 'expense';
+          kind: 'income' | 'expense' | 'savings';
           amount: number;
           memo?: string | null;
           entry_date: string;
@@ -130,7 +130,7 @@ export type Database = {
           user_id?: string;
           account_id?: string | null;
           category_id?: string | null;
-          kind?: 'income' | 'expense';
+          kind?: 'income' | 'expense' | 'savings';
           amount?: number;
           memo?: string | null;
           entry_date?: string;
