@@ -4,21 +4,36 @@ export type Database = {
       profiles: {
         Row: {
           id: string;
+          email: string | null;
           display_name: string | null;
+          profile_image: string | null;
+          auth_provider: 'google' | 'kakao' | null;
+          is_premium: boolean;
+          premium_until: string | null;
           currency: string;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id: string;
+          email?: string | null;
           display_name?: string | null;
+          profile_image?: string | null;
+          auth_provider?: 'google' | 'kakao' | null;
+          is_premium?: boolean;
+          premium_until?: string | null;
           currency?: string;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          email?: string | null;
           display_name?: string | null;
+          profile_image?: string | null;
+          auth_provider?: 'google' | 'kakao' | null;
+          is_premium?: boolean;
+          premium_until?: string | null;
           currency?: string;
           created_at?: string;
           updated_at?: string;

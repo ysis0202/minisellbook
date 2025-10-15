@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AppLogo } from '@/components/app-logo';
 import { TopSummary } from '@/components/top-summary';
@@ -16,7 +16,7 @@ import { mutate } from 'swr';
 import { deleteEntry } from '@/server/actions';
 import { toast } from 'sonner';
 
-export default function HomePage() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const monthParam = searchParams.get('month');
 
@@ -169,5 +169,18 @@ export default function HomePage() {
         onAddEntry={handleAddEntry}
       />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    </div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

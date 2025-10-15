@@ -11,12 +11,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.75.0",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
+    "@types/node": "^20.12.7",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "class-variance-authority": "^0.7.1",
@@ -32,21 +27,14 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4",
-    "zod": "^4.1.12"
+    "typescript": "^5.6.3",
+    "zod": "^3.23.8"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -61,7 +49,11 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
     "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.5",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18"
   }
