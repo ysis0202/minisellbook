@@ -69,6 +69,11 @@ export async function requestNotificationPermission(): Promise<boolean> {
  * 알림 설정 불러오기
  */
 export function getNotificationSettings(): NotificationSettings {
+  // 서버 사이드에서는 기본 설정 반환
+  if (typeof window === 'undefined') {
+    return DEFAULT_SETTINGS;
+  }
+
   try {
     const saved = localStorage.getItem(KEYS.NOTIFICATION_SETTINGS);
     if (saved) {
@@ -84,6 +89,11 @@ export function getNotificationSettings(): NotificationSettings {
  * 알림 설정 저장
  */
 export function saveNotificationSettings(settings: Partial<NotificationSettings>): void {
+  // 서버 사이드에서는 아무것도 하지 않음
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   try {
     const current = getNotificationSettings();
     const updated = { ...current, ...settings };
@@ -122,6 +132,11 @@ export function sendNotification(title: string, options?: NotificationOptions): 
  * 일일 리마인더 알림 발송
  */
 export function sendDailyReminder(): void {
+  // 서버 사이드에서는 실행 안 함
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   const settings = getNotificationSettings();
   
   if (!settings.enabled || !settings.dailyReminder) {
@@ -144,6 +159,11 @@ export function sendDailyReminder(): void {
  * 오늘 이미 리마인더를 받았는지 확인
  */
 function hasReceivedReminderToday(): boolean {
+  // 서버 사이드에서는 false 반환
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
   const lastDate = localStorage.getItem(KEYS.LAST_REMINDER_DATE);
   const today = new Date().toISOString().split('T')[0];
   return lastDate === today;
