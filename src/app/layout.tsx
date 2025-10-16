@@ -24,7 +24,17 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
       >
         {children}
-        <Toaster />
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            style: {
+              marginTop: '12px',
+            },
+            className: 'text-sm',
+            duration: 3000,
+          }}
+          closeButton
+        />
       </body>
     </html>
   );
