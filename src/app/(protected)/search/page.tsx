@@ -99,7 +99,8 @@ export default function SearchPage() {
     if (hasSearched) {
       handleSearch();
     }
-  }, [startDate, endDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startDate, endDate, hasSearched]);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">

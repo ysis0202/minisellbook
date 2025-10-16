@@ -32,7 +32,7 @@ function HomeContent() {
       setCurrentMonth(monthParam);
       setSelectedDate(`${monthParam}-01`);
     }
-  }, [monthParam]);
+  }, [monthParam, currentMonth]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDateModalOpen, setIsDateModalOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<EntryWithDetails | null>(null);

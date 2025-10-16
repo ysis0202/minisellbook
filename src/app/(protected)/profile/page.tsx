@@ -11,6 +11,7 @@ import { signOut } from '@/server/actions';
 import { Profile } from '@/lib/types';
 import { User, Settings, LogOut, Download, Shield, Edit2, Save, X, Bell, Megaphone } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { useNotices } from '@/lib/hooks/use-notices';
 import { NoticeCard } from '@/components/notice-card';
 
@@ -24,10 +25,6 @@ export default function ProfilePage() {
 
   const supabase = createClient();
   const { data: notices, isLoading: noticesLoading } = useNotices();
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
 
   const loadProfile = async () => {
     try {
@@ -52,6 +49,11 @@ export default function ProfilePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSaveProfile = async () => {
     if (!profile) return;
@@ -123,9 +125,11 @@ export default function ProfilePage() {
         <div className="px-4 pb-4">
           <div className="flex items-center gap-3">
             {profile?.profile_image ? (
-              <img
+              <Image
                 src={profile.profile_image}
                 alt="프로필"
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full border-3 border-white shadow-lg"
               />
             ) : (
