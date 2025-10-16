@@ -114,7 +114,7 @@ function HomeContent() {
       <div className="sticky top-0 z-20 shadow-sm">
         {/* 헤더 - 로고 영역 최소화 */}
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="px-4 py-1.5 flex justify-center">
+          <div className="px-4 py-1 flex justify-center">
             <AppLogo size="sm" />
           </div>
         </div>
