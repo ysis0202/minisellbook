@@ -30,3 +30,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Google Play Store keys (DO NOT COMMIT!)
+/google-play-keys
