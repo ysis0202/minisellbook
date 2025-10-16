@@ -11,7 +11,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "MoneyCells - 머니셀즈",
-  description: "당신의 돈을 셀 단위로 관리하다",
+  description: "당신의 돈을 셀 단위로 관리하는 스마트 가계부",
+  manifest: "/manifest.json",
+  themeColor: "#10b981",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "머니셀즈",
+  },
 };
 
 export default function RootLayout({
