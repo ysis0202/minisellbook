@@ -129,7 +129,7 @@ export default function PrivacyPage() {
               <strong>개인정보 보호책임자:</strong> MoneyCells 운영팀
             </p>
             <p className="text-gray-700 mb-2">
-              <strong>이메일:</strong> support@moneycells.com
+              <strong>이메일:</strong> ysis0202@naver.com
             </p>
             <p className="text-gray-700">
               개인정보 침해에 대한 신고나 상담이 필요하신 경우 위 연락처로 문의하시기 바랍니다.
