@@ -337,13 +337,12 @@ export default function StatsPage() {
           {/* 카테고리별 분석 (월별만) */}
           {viewMode === 'month' && (
             <Card>
-            <CardHeader className="pb-2 pt-3 px-3">
-              <CardTitle className="flex items-center gap-1.5 text-sm">
+            <CardHeader className="pb-3 pt-3 px-3">
+              <CardTitle className="flex items-center gap-1.5 text-sm mb-3">
                 <PieChart className="w-4 h-4" />
                 카테고리별 분석
               </CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 pb-3">
+              
               {isLoadingCategories ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
@@ -352,31 +351,31 @@ export default function StatsPage() {
                 </div>
               ) : (
                 <Tabs defaultValue="expense" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+                  <TabsList className="grid w-full grid-cols-3 bg-gray-100/60 p-1 rounded-t-lg">
                     <TabsTrigger 
                       value="expense" 
-                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                      className="gap-1.5 text-xs text-gray-600 data-[state=active]:bg-gradient-to-br data-[state=active]:from-red-50 data-[state=active]:to-red-100/50 data-[state=active]:text-red-700 data-[state=active]:font-semibold rounded-md transition-all"
                     >
                       <TrendingDown className="w-3.5 h-3.5" />
                       지출
                     </TabsTrigger>
                     <TabsTrigger 
                       value="income" 
-                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                      className="gap-1.5 text-xs text-gray-600 data-[state=active]:bg-gradient-to-br data-[state=active]:from-green-50 data-[state=active]:to-green-100/50 data-[state=active]:text-green-700 data-[state=active]:font-semibold rounded-md transition-all"
                     >
                       <TrendingUp className="w-3.5 h-3.5" />
                       수입
                     </TabsTrigger>
                     <TabsTrigger 
                       value="savings" 
-                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                      className="gap-1.5 text-xs text-gray-600 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-50 data-[state=active]:to-blue-100/50 data-[state=active]:text-blue-700 data-[state=active]:font-semibold rounded-md transition-all"
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
                       저축
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="expense" className="space-y-2 mt-3">
+                  <TabsContent value="expense" className="mt-0 pt-4 px-1 space-y-2.5 bg-gradient-to-b from-red-50/40 via-red-50/20 to-transparent rounded-b-lg pb-2">
                     {categoryStats?.expense && categoryStats.expense.length > 0 ? (
                       <>
                         {categoryStats.expense.map((cat, index) => {
@@ -420,7 +419,7 @@ export default function StatsPage() {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="income" className="space-y-2 mt-3">
+                  <TabsContent value="income" className="mt-0 pt-4 px-1 space-y-2.5 bg-gradient-to-b from-green-50/40 via-green-50/20 to-transparent rounded-b-lg pb-2">
                     {categoryStats?.income && categoryStats.income.length > 0 ? (
                       <>
                         {categoryStats.income.map((cat, index) => {
@@ -464,7 +463,7 @@ export default function StatsPage() {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="savings" className="space-y-2 mt-3">
+                  <TabsContent value="savings" className="mt-0 pt-4 px-1 space-y-2.5 bg-gradient-to-b from-blue-50/40 via-blue-50/20 to-transparent rounded-b-lg pb-2">
                     {categoryStats?.savings && categoryStats.savings.length > 0 ? (
                       <>
                         {categoryStats.savings.map((cat, index) => {
@@ -509,7 +508,7 @@ export default function StatsPage() {
                   </TabsContent>
                 </Tabs>
               )}
-            </CardContent>
+            </CardHeader>
           </Card>
           )}
 
