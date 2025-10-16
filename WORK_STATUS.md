@@ -1,12 +1,105 @@
 # 🚀 작업 현황 (2025-10-16)
 
-> **마지막 업데이트**: 2025-10-16 오후  
-> **현재 상태**: 최종 코드 점검 완료, 배포 준비 완료 ✅  
-> **버전**: v1.2.0
+> **마지막 업데이트**: 2025-10-16 저녁  
+> **현재 상태**: Google Play Store 배포 진행 중 📱  
+> **버전**: v1.0.0 (첫 출시)  
+> **Vercel 배포**: ✅ 완료 (assetlinks.json 포함)
 
 ---
 
 ## ✅ 최근 완료한 작업
+
+### 🎉 Google Play Store 배포 진행 (2025-10-16 저녁)
+
+#### 1. UX 개선 작업
+- ✅ 페이지 헤더 디자인 개선 (아이콘 + 타이틀 + 설명)
+  - 홈, 검색, 통계, 캘린더 페이지 전체 적용
+- ✅ 통계 페이지 카테고리 탭 UI 개선
+  - 탭과 컨텐츠 통합 디자인 (자연스러운 전환)
+  - 그라디언트 배경으로 시각적 통일감 제공
+- ✅ 프로필 페이지 리팩토링
+  - 메뉴 방식으로 변경 (기본 설정, 알림 설정, 공지사항)
+  - `/profile/settings`, `/profile/notifications`, `/profile/notices` 분리
+- ✅ Toast 알림 위치 변경 (하단 → 상단)
+  - 네비게이션 바 가리는 문제 해결
+- ✅ 캘린더 반응형 개선
+  - 날짜 겹침 현상 수정
+  - `scale-105` 제거, `ring-2`, `shadow-lg` 적용
+
+#### 2. 기능 추가
+- ✅ 알림 설정 기능 구현
+  - 브라우저 푸시 알림 권한 요청
+  - 일일 리마인더 (오후 6시)
+  - 예산 알림, 저축 목표 알림 (추후 구현 예정)
+- ✅ 광고 배너 컴포넌트 생성
+  - `AdBanner.tsx` - Google AdSense 준비 완료
+  - 홈 화면 상단 고정 영역에 배치
+- ✅ 개인정보 처리방침 페이지 생성
+  - `/privacy` 페이지 - Google Play Store 요구사항 충족
+
+#### 3. PWA 설정
+- ✅ `manifest.json` 생성
+  - 앱 이름: MoneyCells (머니셀즈)
+  - 테마 컬러: #10b981 (에메랄드 그린)
+  - 아이콘: logo192.png, logo512.png
+  - 카테고리: finance, productivity
+- ✅ PWA 메타데이터 추가 (`layout.tsx`)
+  - themeColor, viewport, appleWebApp 설정
+- ✅ 알림 스케줄러 구현
+  - `NotificationScheduler` 컴포넌트
+  - `notifications.ts` 유틸리티
+  - 로컬 스토리지 기반 설정 관리
+  - SSR 안전성 확보
+
+#### 4. PWABuilder를 통한 AAB 생성
+- ✅ PWABuilder에서 Android 패키지 생성
+  - Package ID: `com.moneycells.app`
+  - App name: MoneyCells
+  - Short name: 머니셀즈
+  - Signing Key: 자동 생성 완료
+- ✅ 생성된 파일들:
+  - `머니셀즈.aab` - Google Play Store 업로드용
+  - `머니셀즈.apk` - 테스트용
+  - `assetlinks.json` - 웹-앱 연결용
+  - `signing.keystore` + `signing-key-info.txt` - 서명 키 (백업 완료)
+
+#### 5. assetlinks.json 웹 배포
+- ✅ `public/.well-known/assetlinks.json` 생성
+  - Package name: `com.moneycells.app`
+  - SHA256 fingerprint 포함
+- ✅ GitHub 커밋 & 푸시 완료
+- ✅ Vercel 자동 배포 완료
+  - URL: `https://minisellbook-ouuh-ir1vd25q-jjinhyuks-projects.vercel.app/.well-known/assetlinks.json`
+
+#### 6. Google Play Console 설정
+- ✅ 앱 생성: 머니셀즈 (com.moneycells.app)
+- ✅ 내부 테스트 트랙 생성
+- ✅ AAB 파일 업로드 완료
+  - 버전: 1 (1.0.0.0)
+  - 파일 크기: 1.05MB
+  - API 레벨: 23+
+  - 타겟 SDK: 35
+- ⏳ 신원 확인 대기 중 (1-3일 소요)
+
+#### 7. 서명 키 백업
+- ✅ `google-play-keys/` 폴더 생성
+- ✅ 서명 키 파일 백업:
+  - `signing.keystore`
+  - `signing-key-info.txt`
+  - 키 비밀번호: `bpH5h5gjw874`
+- ✅ `.gitignore`에 추가 (Git 커밋 방지)
+
+#### 8. Vercel 배포 오류 수정
+- ✅ ESLint unescaped quotes 오류 수정
+  - `&ldquo;`, `&rdquo;` 사용
+- ✅ SSR `localStorage` 오류 수정
+  - `typeof window === 'undefined'` 체크 추가
+- ✅ Google OAuth redirect URI 설정
+  - Supabase URL 업데이트
+  - Google Cloud Console authorized redirect URIs 추가
+- ✅ `capacitor.config.ts` 삭제 (빌드 오류 제거)
+
+---
 
 ### 1. 최종 코드 점검 및 품질 개선 (2025-10-16)
 - ✅ 모든 ESLint 경고 수정
@@ -54,16 +147,110 @@
 
 ---
 
-## ⏳ 다음 단계
+## ⏳ 다음 단계 (Google Play Store 출시 완료)
 
-### Supabase 데이터베이스 설정 및 Vercel 배포
-- **상태**: 로컬 빌드 완료, 배포 대기
-- **다음 작업**: 
-  1. Supabase 스키마 적용
-  2. OAuth 설정 확인
-  3. Vercel 환경 변수 설정
-  4. 배포 실행
-- **참고 문서**: `DEPLOYMENT_CHECKLIST.md`, `DEPLOYMENT_GUIDE.md`
+### 📱 현재 진행 상황
+- **상태**: AAB 업로드 완료, 출시 노트 작성 대기 ✅
+- **위치**: Google Play Console → 내부 테스트 → "내부 테스트 버전 만들기" 페이지
+- **대기 중**: Google 신원 확인 (1-3일 소요) ⏳
+
+### 📝 다음 작업 (바로 진행 가능)
+
+#### 1단계: 출시 노트 작성 (가장 급함!)
+Google Play Console 화면에서 **아래로 스크롤**하여 "출시 노트" 섹션 찾기
+
+```
+언어: 한국어 (ko-KR)
+
+내용 예시:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+<ko-KR>
+첫 번째 버전 출시 🎉
+
+주요 기능:
+• 수입, 지출, 저축 관리
+• 월별/연간 통계 및 분석
+• 카테고리별 상세 분석
+• 캘린더 기반 거래 내역
+• 검색 및 필터링
+• 푸시 알림 (일일 리마인더)
+• Google/Kakao 간편 로그인
+
+당신의 돈을 셀 단위로 관리하는 
+스마트 가계부, 머니셀즈입니다!
+</ko-KR>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+#### 2단계: 테스터 지정
+- 내부 테스트용 이메일 주소 등록
+- 본인 계정 추가
+
+#### 3단계: 검토 및 출시
+- "검토" 버튼 클릭
+- 모든 항목 확인
+- "출시" 버튼 클릭
+
+#### 4단계: 신원 확인 완료 대기
+- 1-3일 소요
+- 완료 시 이메일 알림
+- 완료 후 프로덕션 출시 가능
+
+### 📋 추가 설정 (여유 있을 때)
+
+#### Google Play Console 스토어 등록 정보
+- **앱 이름**: MoneyCells (머니셀즈)
+- **짧은 설명** (80자):
+  ```
+  수입, 지출, 저축을 한 번에! 당신의 돈을 셀 단위로 관리하는 스마트 가계부
+  ```
+- **전체 설명** (4000자):
+  ```
+  📊 MoneyCells (머니셀즈) - 당신의 돈을 셀 단위로 관리하는 스마트 가계부
+
+  💰 주요 기능
+  • 수입, 지출, 저축 관리
+  • 월별/연간 통계 및 분석
+  • 카테고리별 상세 분석
+  • 캘린더 기반 거래 내역
+  • 검색 및 필터링
+  • 푸시 알림 (일일 리마인더)
+  • Google/Kakao 간편 로그인
+  
+  📈 강력한 분석 기능
+  • 수입/지출/저축 카테고리별 분석
+  • 월별/연간 추세 그래프
+  • 순잔액 자동 계산
+  • 예산 대비 실제 지출 비교
+  
+  🎯 사용하기 쉬운 UI
+  • 직관적인 디자인
+  • 빠른 입력
+  • 실시간 동기화
+  
+  🔒 안전한 데이터 관리
+  • Supabase 기반 안전한 저장
+  • Google/Kakao OAuth 로그인
+  • 개인정보 보호 철저
+  
+  지금 바로 MoneyCells로 재정 관리를 시작하세요!
+  ```
+
+- **스크린샷**: 
+  - 홈 화면 (캘린더)
+  - 통계 페이지
+  - 검색 페이지
+  - 프로필/더보기 페이지
+  - 최소 2개, 권장 5-8개
+
+- **아이콘**: `logo512.png` (이미 준비됨)
+
+- **카테고리**: 금융
+
+- **개인정보 처리방침 URL**:
+  ```
+  https://minisellbook-ouuh-ir1vd25q-jjinhyuks-projects.vercel.app/privacy
+  ```
 
 ---
 
@@ -153,7 +340,32 @@ NEXT_PUBLIC_SITE_URL=https://your-app.vercel.app
 
 ## 📁 주요 파일 위치
 
-### 새로 추가된 파일
+### Google Play Store 관련 파일
+```
+google-play-keys/                      # 서명 키 백업 (Git 제외)
+  ├─ signing.keystore                  # 앱 서명 키
+  ├─ signing-key-info.txt              # 키 정보 (비밀번호 포함)
+  └─ moneycells-v1.0.0.aab             # AAB 파일 백업
+public/.well-known/
+  └─ assetlinks.json                   # 웹-앱 연결 파일 (Vercel 배포됨)
+public/manifest.json                   # PWA 매니페스트
+public/logo192.png                     # PWA 아이콘 192x192
+public/logo512.png                     # PWA 아이콘 512x512
+```
+
+### 새로 추가된 컴포넌트
+```
+src/components/ad-banner.tsx           # 광고 배너 (AdSense 준비)
+src/components/notification-scheduler.tsx  # 알림 스케줄러
+src/components/notification-settings.tsx   # 알림 설정 (프로필로 이동됨)
+src/lib/notifications.ts               # 알림 유틸리티
+src/app/privacy/page.tsx               # 개인정보 처리방침
+src/app/(protected)/profile/settings/page.tsx      # 기본 설정
+src/app/(protected)/profile/notifications/page.tsx  # 알림 설정
+src/app/(protected)/profile/notices/page.tsx       # 공지사항
+```
+
+### 기존 파일 (이전에 추가됨)
 ```
 src/lib/hooks/use-notices.ts          # 공지사항 Hook
 src/components/notice-card.tsx         # 공지사항 카드 컴포넌트
@@ -290,22 +502,58 @@ main (origin/main과 동기화됨)
 
 ## 🎉 요약
 
-### 오늘 성과
-- 공지사항 시스템 완성 ✅
-- UI/UX 개선 (로고 클릭, 더보기 탭) ✅
-- 배포 오류 모두 수정 ✅
-- 로컬 빌드 성공 ✅
-- Git 업데이트 완료 ✅
+### 오늘 성과 (2025-10-16)
+- ✅ 전체 UX 대폭 개선 (헤더, 탭, 프로필 페이지 리팩토링)
+- ✅ 알림 기능 구현 (일일 리마인더 오후 6시)
+- ✅ PWA 설정 완료 (manifest.json, 아이콘)
+- ✅ 개인정보 처리방침 페이지 생성
+- ✅ PWABuilder로 AAB 생성
+- ✅ Google Play Console AAB 업로드 완료
+- ✅ assetlinks.json Vercel 배포 완료
+- ✅ 서명 키 안전하게 백업
+- ✅ Vercel 배포 오류 모두 수정
+- ✅ Git 커밋 & 푸시 완료
 
-### 내일 우선 작업
-1. **Vercel 배포 확인** (가장 중요!)
-2. **Supabase 스키마 업데이트** (notices 테이블)
-3. **전체 기능 테스트**
+### 📱 현재 상태
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Vercel 배포: 완료 (assetlinks.json 포함)
+✅ AAB 업로드: 완료 (버전 1.0.0.0)
+⏳ 출시 노트: 작성 대기 (다음 단계)
+⏳ 신원 확인: 대기 중 (1-3일)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 🎯 다음 작업 (이어서 할 것)
+1. **출시 노트 작성** (Google Play Console에서 바로 가능)
+2. **테스터 지정** (본인 계정)
+3. **검토 및 출시** 버튼 클릭
+4. **신원 확인 대기** (1-3일)
+5. **스토어 등록 정보 작성** (스크린샷, 설명 등)
+
+### 🔑 중요 정보
+```
+Package ID: com.moneycells.app
+서명 키 비밀번호: bpH5h5gjw874
+백업 위치: google-play-keys/
+Vercel URL: https://minisellbook-ouuh-ir1vd25q-jjinhyuks-projects.vercel.app
+개인정보 처리방침: /privacy
+```
 
 ---
 
-**내일 작업 시작 전 이 파일부터 확인하세요!** 🚀
+## 📝 다음에 작업 시작 전 체크리스트
 
-모든 변경사항은 Git에 커밋되어 있어서 안전하게 이어서 작업할 수 있습니다.
+1. ✅ **WORK_STATUS.md 확인** (이 파일!)
+2. ✅ **Google Play Console 접속** (신원 확인 상태 체크)
+3. ✅ **출시 노트 작성** (아직 안 했으면)
+4. ✅ **테스터 추가** (내부 테스트용)
+5. ⏳ **신원 확인 완료 대기**
+
+---
+
+**모든 변경사항은 Git에 안전하게 저장되어 있습니다!** 🚀
+
+Google 신원 확인이 완료되면 바로 앱 출시가 가능합니다! 🎉
 
 
