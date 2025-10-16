@@ -294,7 +294,7 @@ export function NotificationSettings() {
         {/* 안내 메시지 */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5">
           <p className="text-[10px] text-blue-700 leading-relaxed">
-            💡 <strong>팁:</strong> 일일 리마인더는 매일 설정한 시간에 "오늘의 지출과 수입을 입력해보는건 어떠실까요?" 
+            💡 <strong>팁:</strong> 일일 리마인더는 매일 설정한 시간에 &ldquo;오늘의 지출과 수입을 입력해보는건 어떠실까요?&rdquo; 
             메시지를 보내드립니다. 브라우저를 닫아도 알림을 받을 수 있습니다.
           </p>
         </div>
