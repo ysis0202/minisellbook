@@ -112,15 +112,20 @@ function HomeContent() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* 상단 고정 영역 */}
       <div className="sticky top-0 z-20 shadow-sm">
-        {/* 헤더 - 로고만 간소화, 타이트하게 */}
+        {/* 헤더 - 로고 영역 최소화 */}
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="px-4 py-2 flex justify-center">
+          <div className="px-4 py-1.5 flex justify-center">
             <AppLogo size="sm" />
           </div>
         </div>
         
         {/* 월 요약 - 수입/지출/저축/순잔액 */}
         <TopSummary month={currentMonth} />
+        
+        {/* 광고 배너 - 고정 영역 안에서 항상 노출 */}
+        <div className="bg-white px-3 py-2 border-b border-gray-200">
+          <AdBanner slot="home_header" format="horizontal" />
+        </div>
         
         {/* 월 전환 */}
         <div className="bg-white border-b px-4 py-2">
@@ -129,11 +134,6 @@ function HomeContent() {
             onMonthChange={handleMonthChange}
           />
         </div>
-      </div>
-
-      {/* 광고 배너 - 고정 영역 아래로 이동 */}
-      <div className="bg-white px-3 py-2 border-b">
-        <AdBanner slot="home_header" format="horizontal" />
       </div>
 
       {/* 달력 */}
