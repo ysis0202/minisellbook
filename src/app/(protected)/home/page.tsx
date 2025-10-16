@@ -15,7 +15,7 @@ import { EntryWithDetails } from '@/lib/types';
 import { mutate } from 'swr';
 import { deleteEntry } from '@/server/actions';
 import { toast } from 'sonner';
-import { Home as HomeIcon } from 'lucide-react';
+import { AdBanner } from '@/components/ad-banner';
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -112,20 +112,14 @@ function HomeContent() {
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* 상단 고정 영역 */}
       <div className="sticky top-0 z-20 shadow-sm">
-        {/* 헤더 */}
+        {/* 헤더 - 로고만 간소화, 타이트하게 */}
         <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="px-4 pt-3 pb-2 flex justify-center">
+          <div className="px-4 py-2 flex justify-center">
             <AppLogo size="sm" />
-          </div>
-          <div className="px-4 pb-3">
-            <div className="flex items-center gap-2">
-              <HomeIcon className="w-5 h-5" />
-              <h1 className="text-lg font-bold">홈</h1>
-            </div>
           </div>
         </div>
         
-        {/* 월 요약 */}
+        {/* 월 요약 - 수입/지출/저축/순잔액 */}
         <TopSummary month={currentMonth} />
         
         {/* 월 전환 */}
@@ -135,6 +129,11 @@ function HomeContent() {
             onMonthChange={handleMonthChange}
           />
         </div>
+      </div>
+
+      {/* 광고 배너 - 고정 영역 아래로 이동 */}
+      <div className="bg-white px-3 py-2 border-b">
+        <AdBanner slot="home_header" format="horizontal" />
       </div>
 
       {/* 달력 */}

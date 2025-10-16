@@ -4,23 +4,19 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Bell, BellOff, CheckCircle2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Bell, BellOff, CheckCircle2, Clock, Zap } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface NotificationSettings {
-  enabled: boolean;
-  dailySummary: boolean;
-  budgetAlerts: boolean;
-  savingsGoal: boolean;
-}
+import { 
+  getNotificationSettings, 
+  saveNotificationSettings, 
+  requestNotificationPermission,
+  testDailyReminder,
+  type NotificationSettings as NotificationSettingsType
+} from '@/lib/notifications';
 
 export function NotificationSettings() {
-  const [settings, setSettings] = useState<NotificationSettings>({
-    enabled: false,
-    dailySummary: false,
-    budgetAlerts: false,
-    savingsGoal: false,
-  });
+  const [settings, setSettings] = useState<NotificationSettingsType>(getNotificationSettings());
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [loading, setLoading] = useState(false);
 
@@ -30,33 +26,21 @@ export function NotificationSettings() {
       setPermission(Notification.permission);
     }
 
-    // 로컬 스토리지에서 설정 불러오기
-    const savedSettings = localStorage.getItem('notificationSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
+    // 최신 설정 불러오기
+    setSettings(getNotificationSettings());
   }, []);
 
-  const requestPermission = async () => {
-    if (!('Notification' in window)) {
-      toast.error('이 브라우저는 알림을 지원하지 않습니다');
-      return;
-    }
-
+  const handleRequestPermission = async () => {
     setLoading(true);
     try {
-      const result = await Notification.requestPermission();
-      setPermission(result);
-
-      if (result === 'granted') {
-        toast.success('알림 권한이 허용되었습니다');
-        // 테스트 알림 보내기
-        new Notification('MoneyCells', {
-          body: '알림이 성공적으로 활성화되었습니다! 🎉',
-          icon: '/favicon.svg',
-        });
-        
-        setSettings(prev => ({ ...prev, enabled: true }));
+      const granted = await requestNotificationPermission();
+      
+      if (granted) {
+        setPermission('granted');
+        const updatedSettings = { ...settings, enabled: true };
+        setSettings(updatedSettings);
+        saveNotificationSettings(updatedSettings);
+        toast.success('알림이 활성화되었습니다! 🎉');
       } else {
         toast.error('알림 권한이 거부되었습니다');
       }
@@ -68,10 +52,10 @@ export function NotificationSettings() {
     }
   };
 
-  const toggleSetting = (key: keyof NotificationSettings) => {
+  const toggleSetting = (key: keyof NotificationSettingsType) => {
     if (key === 'enabled') {
       if (permission !== 'granted') {
-        requestPermission();
+        handleRequestPermission();
         return;
       }
     }
@@ -82,19 +66,39 @@ export function NotificationSettings() {
     };
 
     setSettings(newSettings);
-    localStorage.setItem('notificationSettings', JSON.stringify(newSettings));
+    saveNotificationSettings(newSettings);
     toast.success('설정이 저장되었습니다');
   };
 
-  const disableAll = () => {
+  const handleTimeChange = (time: string) => {
     const newSettings = {
+      ...settings,
+      reminderTime: time,
+    };
+    setSettings(newSettings);
+    saveNotificationSettings(newSettings);
+    toast.success(`알림 시간이 ${time}로 변경되었습니다`);
+  };
+
+  const handleTestNotification = () => {
+    if (permission !== 'granted') {
+      toast.error('먼저 알림 권한을 허용해주세요');
+      return;
+    }
+    testDailyReminder();
+    toast.success('테스트 알림을 발송했습니다');
+  };
+
+  const disableAll = () => {
+    const newSettings: NotificationSettingsType = {
       enabled: false,
-      dailySummary: false,
+      dailyReminder: false,
+      reminderTime: '18:00',
       budgetAlerts: false,
       savingsGoal: false,
     };
     setSettings(newSettings);
-    localStorage.setItem('notificationSettings', JSON.stringify(newSettings));
+    saveNotificationSettings(newSettings);
     toast.success('모든 알림이 비활성화되었습니다');
   };
 
@@ -168,100 +172,133 @@ export function NotificationSettings() {
 
           {/* 세부 알림 설정 */}
           {settings.enabled && (
-            <div className="space-y-2 pl-3 border-l-2 border-emerald-200">
-              {/* 일일 요약 */}
-              <div className="flex items-center justify-between py-2 px-2">
-                <div>
-                  <Label htmlFor="daily-summary" className="text-xs font-medium cursor-pointer">
-                    일일 요약 (오후 9시)
-                  </Label>
-                  <p className="text-[10px] text-gray-500">매일 저녁 하루 지출 요약</p>
+            <div className="space-y-3 pl-3 border-l-2 border-emerald-200">
+              {/* 일일 리마인더 - 핵심 기능 */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <Label htmlFor="daily-reminder" className="text-xs font-semibold cursor-pointer text-blue-900">
+                        일일 리마인더 💰
+                      </Label>
+                      <p className="text-[10px] text-blue-700 mt-0.5">
+                        매일 정해진 시간에 기록 알림
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    id="daily-reminder"
+                    variant={settings.dailyReminder ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => toggleSetting('dailyReminder')}
+                    className={`h-7 min-w-[50px] text-xs ${
+                      settings.dailyReminder 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : 'border-blue-300'
+                    }`}
+                  >
+                    {settings.dailyReminder ? 'ON' : 'OFF'}
+                  </Button>
                 </div>
-                <Button
-                  id="daily-summary"
-                  variant={settings.dailySummary ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleSetting('dailySummary')}
-                  className={`h-7 min-w-[50px] text-xs ${
-                    settings.dailySummary 
-                      ? 'bg-emerald-600 hover:bg-emerald-700' 
-                      : ''
-                  }`}
-                >
-                  {settings.dailySummary ? 'ON' : 'OFF'}
-                </Button>
+
+                {/* 시간 선택 */}
+                {settings.dailyReminder && (
+                  <div className="mt-2 pt-2 border-t border-blue-200">
+                    <Label htmlFor="reminder-time" className="text-[10px] text-blue-700 mb-1 block">
+                      알림 시간
+                    </Label>
+                    <Select value={settings.reminderTime} onValueChange={handleTimeChange}>
+                      <SelectTrigger id="reminder-time" className="h-8 text-xs bg-white border-blue-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">오전 9시</SelectItem>
+                        <SelectItem value="12:00">오후 12시</SelectItem>
+                        <SelectItem value="15:00">오후 3시</SelectItem>
+                        <SelectItem value="18:00">오후 6시 (추천)</SelectItem>
+                        <SelectItem value="21:00">오후 9시</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
-              {/* 예산 초과 알림 */}
-              <div className="flex items-center justify-between py-2 px-2">
+              {/* 예산 초과 알림 - 향후 구현 */}
+              <div className="flex items-center justify-between py-2 px-2 opacity-50">
                 <div>
-                  <Label htmlFor="budget-alerts" className="text-xs font-medium cursor-pointer">
+                  <Label htmlFor="budget-alerts" className="text-xs font-medium cursor-pointer flex items-center gap-1">
                     예산 초과 경고
+                    <span className="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">준비중</span>
                   </Label>
                   <p className="text-[10px] text-gray-500">예산 80% 도달 시 알림</p>
                 </div>
                 <Button
                   id="budget-alerts"
-                  variant={settings.budgetAlerts ? "default" : "outline"}
+                  variant="outline"
                   size="sm"
-                  onClick={() => toggleSetting('budgetAlerts')}
-                  className={`h-7 min-w-[50px] text-xs ${
-                    settings.budgetAlerts 
-                      ? 'bg-emerald-600 hover:bg-emerald-700' 
-                      : ''
-                  }`}
+                  disabled
+                  className="h-7 min-w-[50px] text-xs"
                 >
-                  {settings.budgetAlerts ? 'ON' : 'OFF'}
+                  OFF
                 </Button>
               </div>
 
-              {/* 저축 목표 알림 */}
-              <div className="flex items-center justify-between py-2 px-2">
+              {/* 저축 목표 알림 - 향후 구현 */}
+              <div className="flex items-center justify-between py-2 px-2 opacity-50">
                 <div>
-                  <Label htmlFor="savings-goal" className="text-xs font-medium cursor-pointer">
+                  <Label htmlFor="savings-goal" className="text-xs font-medium cursor-pointer flex items-center gap-1">
                     저축 목표 달성
+                    <span className="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">준비중</span>
                   </Label>
                   <p className="text-[10px] text-gray-500">목표 달성 시 축하 알림</p>
                 </div>
                 <Button
                   id="savings-goal"
-                  variant={settings.savingsGoal ? "default" : "outline"}
+                  variant="outline"
                   size="sm"
-                  onClick={() => toggleSetting('savingsGoal')}
-                  className={`h-7 min-w-[50px] text-xs ${
-                    settings.savingsGoal 
-                      ? 'bg-emerald-600 hover:bg-emerald-700' 
-                      : ''
-                  }`}
+                  disabled
+                  className="h-7 min-w-[50px] text-xs"
                 >
-                  {settings.savingsGoal ? 'ON' : 'OFF'}
+                  OFF
                 </Button>
               </div>
             </div>
           )}
         </div>
 
-        {/* 모두 비활성화 버튼 */}
+        {/* 테스트 & 모두 비활성화 버튼 */}
         {settings.enabled && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={disableAll}
-            className="w-full h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-          >
-            모든 알림 끄기
-          </Button>
+          <div className="space-y-2 pt-2 border-t">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTestNotification}
+              className="w-full h-8 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+            >
+              <Zap className="w-3 h-3 mr-1" />
+              테스트 알림 보내기
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={disableAll}
+              className="w-full h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              모든 알림 끄기
+            </Button>
+          </div>
         )}
 
         {/* 안내 메시지 */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5">
           <p className="text-[10px] text-blue-700 leading-relaxed">
-            💡 <strong>팁:</strong> 알림은 브라우저를 닫아도 계속 받을 수 있습니다. 
-            설정은 언제든지 변경할 수 있습니다.
+            💡 <strong>팁:</strong> 일일 리마인더는 매일 설정한 시간에 "오늘의 지출과 수입을 입력해보는건 어떠실까요?" 
+            메시지를 보내드립니다. 브라우저를 닫아도 알림을 받을 수 있습니다.
           </p>
         </div>
       </CardContent>
     </Card>
   );
 }
-
