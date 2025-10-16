@@ -52,8 +52,8 @@ export function MonthCalendar({ currentMonth, selectedDate, onDateSelect, onDate
         ))}
       </div>
 
-      {/* 달력 그리드 */}
-      <div className="grid grid-cols-7 gap-1">
+      {/* 달력 그리드 - gap을 늘려서 반응형 화면에서 겹침 방지 */}
+      <div className="grid grid-cols-7 gap-1.5">
         {/* 빈 칸들 */}
         {emptyDays.map((_, index) => (
           <div key={`empty-${index}`} className="aspect-square" />
@@ -74,7 +74,8 @@ export function MonthCalendar({ currentMonth, selectedDate, onDateSelect, onDate
               className={cn(
                 'aspect-square flex flex-col items-center justify-center text-base font-medium transition-all duration-200 rounded-xl relative active:scale-95',
                 'hover:bg-gray-100 min-h-[44px]',
-                isSelected && 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-md scale-105',
+                // scale-105 제거하고 ring과 shadow로만 선택 표시 (겹침 방지)
+                isSelected && 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg ring-2 ring-emerald-400',
                 isCurrentDay && !isSelected && 'bg-emerald-50 text-emerald-700 font-bold ring-2 ring-emerald-200',
                 dayOfWeek === 0 && !isSelected && !isCurrentDay && 'text-red-500',
                 dayOfWeek === 6 && !isSelected && !isCurrentDay && 'text-blue-500',
