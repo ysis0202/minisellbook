@@ -9,11 +9,12 @@ import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
 import { signOut } from '@/server/actions';
 import { Profile } from '@/lib/types';
-import { User, Settings, LogOut, Download, Shield, Edit2, Save, X, Bell, Megaphone } from 'lucide-react';
+import { User, Settings, LogOut, Download, Shield, Edit2, Save, X, Bell, Megaphone, Menu } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useNotices } from '@/lib/hooks/use-notices';
 import { NoticeCard } from '@/components/notice-card';
+import { NotificationSettings } from '@/components/notification-settings';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -122,7 +123,11 @@ export default function ProfilePage() {
         <div className="px-4 pt-3 pb-2 flex justify-center">
           <AppLogo size="sm" />
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-3">
+          <div className="flex items-center gap-2 mb-3">
+            <Menu className="w-5 h-5" />
+            <h1 className="text-lg font-bold">더보기</h1>
+          </div>
           <div className="flex items-center gap-3">
             {profile?.profile_image ? (
               <Image
@@ -151,6 +156,9 @@ export default function ProfilePage() {
       </div>
 
       <div className="p-3 space-y-3">
+        {/* 알림 설정 */}
+        <NotificationSettings />
+
         {/* 공지사항/이벤트 */}
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AppLogo } from '@/components/app-logo';
 import { MonthCard } from '@/components/month-card';
 import { useYearSummary } from '@/lib/hooks/use-entries';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function CalendarPage() {
@@ -47,8 +47,12 @@ export default function CalendarPage() {
         <div className="px-4 pt-3 pb-2 flex justify-center">
           <AppLogo size="sm" />
         </div>
-        <div className="px-4 pb-3">
-          <h1 className="text-base font-bold">연간 요약</h1>
+        <div className="px-4 pb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Calendar className="w-5 h-5" />
+            <h1 className="text-lg font-bold">연간 요약</h1>
+          </div>
+          <p className="text-emerald-50 text-xs">월별 재정 흐름을 확인하세요</p>
         </div>
       </div>
 

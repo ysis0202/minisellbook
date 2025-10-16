@@ -81,8 +81,12 @@ export default function StatsPage() {
         <div className="px-4 pt-3 pb-2 flex justify-center">
           <AppLogo size="sm" />
         </div>
-        <div className="px-4 pb-3">
-          <h1 className="text-base font-bold">통계</h1>
+        <div className="px-4 pb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <BarChart3 className="w-5 h-5" />
+            <h1 className="text-lg font-bold">통계</h1>
+          </div>
+          <p className="text-emerald-50 text-xs">수입, 지출, 저축을 한눈에 확인하세요</p>
         </div>
       </div>
 
@@ -348,16 +352,25 @@ export default function StatsPage() {
                 </div>
               ) : (
                 <Tabs defaultValue="expense" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="expense" className="gap-1.5 text-xs">
+                  <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+                    <TabsTrigger 
+                      value="expense" 
+                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                    >
                       <TrendingDown className="w-3.5 h-3.5" />
                       지출
                     </TabsTrigger>
-                    <TabsTrigger value="income" className="gap-1.5 text-xs">
+                    <TabsTrigger 
+                      value="income" 
+                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                    >
                       <TrendingUp className="w-3.5 h-3.5" />
                       수입
                     </TabsTrigger>
-                    <TabsTrigger value="savings" className="gap-1.5 text-xs">
+                    <TabsTrigger 
+                      value="savings" 
+                      className="gap-1.5 text-xs data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all"
+                    >
                       <BarChart3 className="w-3.5 h-3.5" />
                       저축
                     </TabsTrigger>
