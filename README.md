@@ -16,6 +16,7 @@
 - [주요 기능](#-주요-기능)
 - [기술 스택](#-기술-스택)
 - [시작하기](#-시작하기)
+- [Google Play 배포](#-google-play-배포) ⭐ NEW
 - [프로젝트 구조](#-프로젝트-구조)
 - [데이터베이스 스키마](#-데이터베이스-스키마)
 - [핵심 기능 상세](#-핵심-기능-상세)
@@ -173,6 +174,38 @@ npm run dev
 ```
 
 http://localhost:3000 접속
+
+---
+
+## 📱 Google Play 배포
+
+### 🚀 빠른 시작
+
+**앱 스토어 배포를 시작하시나요?**
+
+👉 **[시작하기.md](./시작하기.md)** - 전체 개요 및 안내  
+👉 **[QUICK_START_CHECKLIST.md](./QUICK_START_CHECKLIST.md)** - 단계별 체크리스트 (30분)  
+👉 **[SCREENSHOT_GUIDE.md](./SCREENSHOT_GUIDE.md)** - 스크린샷 촬영 가이드  
+👉 **[COMPLETE_DEPLOYMENT_GUIDE.md](./COMPLETE_DEPLOYMENT_GUIDE.md)** - 전체 가이드 + 업데이트 방법
+
+### 📦 앱 정보
+
+```
+앱 이름: MoneyCells (머니셀즈)
+Package ID: com.moneycells.app
+현재 버전: 1.0.0
+Google Play Store: 출시 준비 중
+```
+
+### 🔄 앱 업데이트 방법
+
+**간단 요약**: 웹사이트만 수정하면 앱도 자동 업데이트! (PWA)
+
+1. 코드 수정 → Git 푸시
+2. Vercel 자동 배포 (2-3분)
+3. 사용자가 앱 새로고침 → 업데이트 완료!
+
+**자세한 내용**: [COMPLETE_DEPLOYMENT_GUIDE.md](./COMPLETE_DEPLOYMENT_GUIDE.md) → "앱 업데이트 방법" 섹션
 
 ---
 

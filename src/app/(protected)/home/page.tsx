@@ -108,27 +108,25 @@ function HomeContent() {
     mutate(['month-entries', currentMonth]);
   };
 
+  // 환경 변수로 광고 표시 제어 (기본: 숨김, 나중에 켜기 쉬움)
+  const showAds = process.env.NEXT_PUBLIC_SHOW_ADS === 'true';
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* 상단 고정 영역 */}
+      {/* 상단 고정 영역 - 최소화 */}
       <div className="sticky top-0 z-20 shadow-sm">
-        {/* 헤더 - 로고 영역 최소화 */}
-        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-          <div className="px-4 py-1 flex justify-center">
-            <AppLogo size="sm" />
+        {/* 월 요약 - 수입/지출/저축/순잔액 (헤더 로고 제거하고 바로 시작) */}
+        <TopSummary month={currentMonth} compact />
+        
+        {/* 광고 배너 - 환경 변수로 제어 (기본: 숨김) */}
+        {showAds && (
+          <div className="bg-white px-3 py-2 border-b border-gray-200">
+            <AdBanner slot="home_header" format="horizontal" />
           </div>
-        </div>
+        )}
         
-        {/* 월 요약 - 수입/지출/저축/순잔액 */}
-        <TopSummary month={currentMonth} />
-        
-        {/* 광고 배너 - 고정 영역 안에서 항상 노출 */}
-        <div className="bg-white px-3 py-2 border-b border-gray-200">
-          <AdBanner slot="home_header" format="horizontal" />
-        </div>
-        
-        {/* 월 전환 */}
-        <div className="bg-white border-b px-4 py-2">
+        {/* 월 전환 - 더 작게 */}
+        <div className="bg-white border-b px-3 py-1.5">
           <MonthSwitcher
             currentMonth={currentMonth}
             onMonthChange={handleMonthChange}
