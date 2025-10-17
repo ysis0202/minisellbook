@@ -1,8 +1,12 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.moneycells.app",
-        "sha256_cert_fingerprints": ["C5:EF:51:F3:92:D2:6E:DF:70:FE:B9:E6:44:11:1A:6B:AF:D3:83:41:2C:CC:D1:CB:8B:74:B4:8A:E0:56:A0:6C"]
-      }
-    }]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.moneycells.app",
+      "sha256_cert_fingerprints": [
+        "C5:EF:51:F3:92:D2:6E:DF:70:FE:B9:E6:44:11:1A:6B:AF:D3:83:41:2C:CC:D1:CB:8B:74:B4:8A:E0:56:A0:6C"
+      ]
+    }
+  }
+]
