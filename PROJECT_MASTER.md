@@ -1,22 +1,65 @@
 # 📱 MoneyCells (머니셀즈) - 프로젝트 마스터 문서
 
 > **당신의 돈을 셀 단위로 관리하는 스마트 가계부**  
-> **버전**: v1.1.0 | **작성일**: 2025-10-17 | **상태**: ✅ 배포 준비 완료
+> **버전**: v1.1.0 | **최종 수정**: 2025-10-17 | **상태**: ✅ Google Play 배포 진행 중
 
 ---
 
 ## 📋 목차
 
-1. [프로젝트 개요](#-프로젝트-개요)
-2. [빠른 시작](#-빠른-시작)
-3. [기술 스택 & 버전](#-기술-스택--버전)
-4. [개발 환경 설정](#-개발-환경-설정)
-5. [주요 기능](#-주요-기능)
-6. [프로젝트 구조](#-프로젝트-구조)
-7. [배포 가이드](#-배포-가이드)
-8. [업데이트 방법](#-업데이트-방법)
-9. [트러블슈팅](#-트러블슈팅)
-10. [문서 가이드](#-문서-가이드)
+1. [최근 변경사항](#-최근-변경사항) ⭐ NEW
+2. [프로젝트 개요](#-프로젝트-개요)
+3. [빠른 시작](#-빠른-시작)
+4. [기술 스택 & 버전](#-기술-스택--버전)
+5. [개발 환경 설정](#-개발-환경-설정)
+6. [주요 기능](#-주요-기능)
+7. [프로젝트 구조](#-프로젝트-구조)
+8. [배포 가이드](#-배포-가이드)
+9. [업데이트 방법](#-업데이트-방법)
+10. [트러블슈팅](#-트러블슈팅)
+11. [문서 가이드](#-문서-가이드)
+
+---
+
+## 🆕 최근 변경사항
+
+### 2025-10-17 (오늘)
+
+#### ✅ 로그아웃 기능 수정
+- Server Action에서 `redirect()` 직접 호출 제거
+- Client-side 리다이렉션으로 변경
+- 에러 처리 개선
+
+#### ✅ UI 최적화
+- 홈 화면 광고 배너 숨김 (환경 변수로 제어)
+- `TopSummary` 컴포넌트 compact 모드 추가
+- 캘린더 표시 영역 약 70% 증가 (~180px 확보)
+
+#### ✅ Next.js 15 호환성
+- `metadata` export에서 `viewport` 분리
+- `themeColor` 설정 수정
+- 빌드 경고 모두 제거
+
+#### ✅ PWA 아이콘 설정
+- `manifest.json`에서 `favicon.svg` 제거
+- PNG 아이콘으로 통일 (logo192.png, logo512.png)
+- 404 에러 해결
+
+#### ✅ Android 앱 Digital Asset Links
+- `public/.well-known/assetlinks.json` 생성
+- SHA-256 지문 추가 (서명 키 기반)
+- TWA (Trusted Web Activity) 인증 완료
+
+#### ✅ Google Play Store 배포 준비
+- Package ID: `com.moneycells.app`
+- Privacy Policy URL 설정
+- AAB 파일 생성 및 업로드 진행 중
+
+#### 📝 문서 업데이트
+- `PROJECT_MASTER.md` 통합 및 업데이트
+- `PACKAGE_ID_확인방법.md` 생성
+- `AAB_재생성_가이드.md` 생성
+- 트러블슈팅 섹션 대폭 보강
 
 ---
 
@@ -448,6 +491,159 @@ npx cap open ios
 ---
 
 ## 🐛 트러블슈팅
+
+### 최근 해결된 문제 (2025-10-17)
+
+#### ✅ 로그아웃 실패 ("로그아웃에 실패했습니다")
+**원인**: Server Action에서 직접 `redirect()` 호출
+
+**해결**:
+```typescript
+// src/server/actions.ts
+export async function signOut() {
+  try {
+    const supabase = await createServer();
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Failed to sign out' };
+  }
+}
+
+// src/app/(protected)/profile/page.tsx
+const handleSignOut = async () => {
+  if (confirm('정말 로그아웃하시겠습니까?')) {
+    try {
+      const result = await signOut();
+      
+      if (result?.success) {
+        toast.success('로그아웃되었습니다');
+        router.push('/auth');
+        router.refresh();
+      } else {
+        toast.error(result?.error || '로그아웃에 실패했습니다');
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      toast.error('로그아웃에 실패했습니다');
+    }
+  }
+};
+```
+
+#### ✅ favicon.svg 404 에러
+**원인**: `manifest.json`에 존재하지 않는 `favicon.svg` 참조
+
+**해결**:
+```json
+// public/manifest.json에서 favicon.svg 항목 제거
+// src/app/layout.tsx에서 icons 설정
+export const metadata: Metadata = {
+  // ...
+  icons: {
+    icon: "/logo512.png",
+    apple: "/logo192.png",
+  },
+};
+```
+
+#### ✅ Next.js 15 Metadata/Viewport 경고
+**원인**: Next.js 15에서 `themeColor`와 `viewport`를 별도 export로 분리
+
+**해결**:
+```typescript
+// src/app/layout.tsx
+export const metadata: Metadata = {
+  title: "MoneyCells - 머니셀즈",
+  description: "당신의 돈을 셀 단위로 관리하는 스마트 가계부",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "머니셀즈",
+  },
+  icons: {
+    icon: "/logo512.png",
+    apple: "/logo192.png",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#10b981",
+};
+```
+
+#### ✅ Android 앱 404 에러 (DEPLOYMENT_NOT_FOUND)
+**원인**: Digital Asset Links 파일 누락
+
+**해결**:
+```bash
+# 1. .well-known 디렉토리 생성
+mkdir public/.well-known
+
+# 2. assetlinks.json 생성
+# public/.well-known/assetlinks.json
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.moneycells.app",
+      "sha256_cert_fingerprints": [
+        "C5:EF:51:F3:92:D2:6E:DF:70:FE:B9:E6:44:11:1A:6B:AF:D3:83:41:2C:CC:D1:CB:8B:74:B4:8A:E0:56:A0:6C"
+      ]
+    }
+  }
+]
+
+# 3. Git 푸시
+git add .
+git commit -m "feat: Add assetlinks.json for Android app verification"
+git push origin main
+
+# 4. Vercel 배포 확인
+# https://minisellbook-ouuh.vercel.app/.well-known/assetlinks.json
+```
+
+#### ✅ Google Play Console AAB 업로드 에러
+**문제 1**: "APK 또는 Android App Bundle의 패키지 이름이 com.moneycells.app이(가) 있어야 합니다"
+
+**해결**:
+- PWABuilder Options에서 Package ID 정확히 입력
+- `com.moneycells.app` (정확히 이대로!)
+
+**문제 2**: "개인정보처리방침 페이지를 찾을 수 없습니다"
+
+**해결**:
+- PWABuilder Options에서 Privacy Policy URL 입력
+- `https://minisellbook-ouuh.vercel.app/privacy`
+
+**PWABuilder 올바른 설정**:
+```
+URL: https://minisellbook-ouuh.vercel.app
+Options 클릭:
+  Package ID: com.moneycells.app
+  App name: 머니셀즈
+  Version code: 2 (또는 증가된 숫자)
+  Host: minisellbook-ouuh.vercel.app
+  Privacy Policy URL: https://minisellbook-ouuh.vercel.app/privacy
+  
+Signing Key:
+  ○ Generate new (X)
+  ● Use mine (O)
+  File: google-play-keys/signing.keystore
+  Password: bpH5h5gjw874
+```
+
+---
 
 ### 자주 발생하는 문제
 
