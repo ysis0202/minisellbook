@@ -14,15 +14,42 @@
 ## 📋 목차
 
 - [주요 기능](#-주요-기능)
+- [빠른 시작](#-빠른-시작) ⭐ NEW
 - [기술 스택](#-기술-스택)
 - [시작하기](#-시작하기)
-- [Google Play 배포](#-google-play-배포) ⭐ NEW
+- [Google Play 배포](#-google-play-배포)
 - [프로젝트 구조](#-프로젝트-구조)
 - [데이터베이스 스키마](#-데이터베이스-스키마)
 - [핵심 기능 상세](#-핵심-기능-상세)
 - [주의사항](#-주의사항)
 - [트러블슈팅](#-트러블슈팅)
+- [문서 가이드](#-문서-가이드) ⭐ NEW
 - [업데이트 내역](#-업데이트-내역)
+
+---
+
+## ⚡ 빠른 시작
+
+### 🎯 처음 보시는 분
+**프로젝트 전체를 파악하고 싶으신가요?**
+
+👉 **[PROJECT_MASTER.md](./PROJECT_MASTER.md)** - 한 문서에서 모든 것을 확인하세요!
+
+이 문서에 포함된 내용:
+- ✅ 프로젝트 개요 & 기술 스택
+- ✅ 개발 환경 설정 (5분)
+- ✅ 주요 기능 상세
+- ✅ 배포 가이드 (단계별)
+- ✅ 업데이트 방법
+- ✅ 트러블슈팅
+
+### 🚀 앱 스토어 출시하시는 분
+**Google Play Store 출시 진행 중이신가요?**
+
+👉 **[QUICK_START_CHECKLIST.md](./QUICK_START_CHECKLIST.md)** - 30분 체크리스트
+
+### 📚 모든 문서 보기
+👉 **[docs/README.md](./docs/README.md)** - 문서 가이드
 
 ---
 
@@ -567,6 +594,38 @@ return {
 - 월간 캘린더
 - 통계 및 검색
 - Google/Kakao 로그인
+
+---
+
+## 📚 문서 가이드
+
+### 어떤 문서를 읽어야 하나요?
+
+| 상황 | 문서 | 소요 시간 |
+|------|------|----------|
+| 🎯 **프로젝트 전체 파악** | [PROJECT_MASTER.md](./PROJECT_MASTER.md) | 10분 |
+| 🚀 **Google Play 출시** | [QUICK_START_CHECKLIST.md](./QUICK_START_CHECKLIST.md) | 30분 |
+| 📖 **상세 배포 가이드** | [COMPLETE_DEPLOYMENT_GUIDE.md](./COMPLETE_DEPLOYMENT_GUIDE.md) | - |
+| 🍎 **iOS 출시** | [APPLE_APP_STORE_GUIDE.md](./APPLE_APP_STORE_GUIDE.md) | - |
+| 📸 **스크린샷 촬영** | [SCREENSHOT_GUIDE.md](./SCREENSHOT_GUIDE.md) | 10분 |
+| 🎨 **UI 업데이트** | [UI_UPDATE_GUIDE.md](./UI_UPDATE_GUIDE.md) | - |
+| 🗄️ **DB 스키마** | [SCHEMA_UPDATE_GUIDE.md](./SCHEMA_UPDATE_GUIDE.md) | - |
+
+### 문서 구조
+```
+minicellbook/
+├── PROJECT_MASTER.md           ⭐ 마스터 문서
+├── README.md                   이 파일!
+├── QUICK_START_CHECKLIST.md    배포 체크리스트
+├── COMPLETE_DEPLOYMENT_GUIDE.md 상세 가이드
+├── APPLE_APP_STORE_GUIDE.md    iOS 가이드
+├── SCREENSHOT_GUIDE.md         스크린샷 가이드
+├── UI_UPDATE_GUIDE.md          UI 변경 내역
+├── SCHEMA_UPDATE_GUIDE.md      DB 가이드
+└── docs/
+    ├── README.md               문서 안내
+    └── archive/                오래된 문서
+```
 
 ---
 
