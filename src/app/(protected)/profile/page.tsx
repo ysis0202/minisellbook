@@ -48,7 +48,15 @@ export default function ProfilePage() {
   const handleSignOut = async () => {
     if (confirm('정말 로그아웃하시겠습니까?')) {
       try {
-        await signOut();
+        const result = await signOut();
+        
+        if (result?.success) {
+          toast.success('로그아웃되었습니다');
+          router.push('/auth');
+          router.refresh();
+        } else {
+          toast.error(result?.error || '로그아웃에 실패했습니다');
+        }
       } catch (error) {
         console.error('Sign out error:', error);
         toast.error('로그아웃에 실패했습니다');

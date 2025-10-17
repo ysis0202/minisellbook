@@ -51,9 +51,20 @@ export async function signInWithKakao() {
 }
 
 export async function signOut() {
-  const supabase = await createServer();
-  await supabase.auth.signOut();
-  redirect('/auth');
+  try {
+    const supabase = await createServer();
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      console.error('Sign out error:', error);
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Sign out error:', error);
+    return { success: false, error: 'Failed to sign out' };
+  }
 }
 
 export async function ensureOnboard() {
